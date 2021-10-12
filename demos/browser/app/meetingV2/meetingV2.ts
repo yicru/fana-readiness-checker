@@ -54,7 +54,6 @@ import {
   TranscriptItemType,
   TranscriptResult,
   Versioning,
-  VideoAdaptiveProbePolicy,
   VideoDownlinkObserver,
   VideoFrameProcessor,
   VideoInputDevice,
@@ -528,6 +527,19 @@ export class DemoMeetingApp
       (document.getElementById('planB') as HTMLInputElement).disabled = true;
     }
     (document.getElementById('enable-pin') as HTMLInputElement).disabled = true;
+    const priorityDownlink = document.getElementById('priority-downlink-policy') as HTMLInputElement;
+    priorityDownlink.checked = true;
+    priorityDownlink.onchange = () => {
+      this.usePriorityBasedDownlinkPolicy = priorityDownlink.checked;
+    };
+    const priorityBasedDownlinkPolicyConfig = document.getElementById(
+      'priority-downlink-policy-preset'
+    ) as HTMLSelectElement;
+    const enablePinElem = document.getElementById('enable-pin') as HTMLInputElement;
+
+    priorityBasedDownlinkPolicyConfig.style.display = 'block';
+    enablePinElem.disabled = false;
+    enablePinElem.checked = true;
 
     document.getElementById('priority-downlink-policy').addEventListener('change', e => {
       this.usePriorityBasedDownlinkPolicy = (document.getElementById('priority-downlink-policy') as HTMLInputElement).checked;
@@ -547,6 +559,9 @@ export class DemoMeetingApp
         enablePinElem.checked = false;
       }
     });
+
+    this.usePriorityBasedDownlinkPolicy = true;
+
 
     const presetDropDown = document.getElementById('priority-downlink-policy-preset') as HTMLSelectElement;
     presetDropDown.addEventListener('change', async e => {
@@ -681,13 +696,15 @@ export class DemoMeetingApp
     earlyConnectCheckbox.checked = SHOULD_EARLY_CONNECT;
     earlyConnectCheckbox.onchange = () => {
       SHOULD_EARLY_CONNECT = !!earlyConnectCheckbox.checked;
-    }
+    };
 
     const dieCheckbox = document.getElementById('die') as HTMLInputElement;
     dieCheckbox.checked = SHOULD_DIE_ON_FATALS;
     dieCheckbox.onchange = () => {
       SHOULD_DIE_ON_FATALS = !!dieCheckbox.checked;
-    }
+    };
+
+
 
     const speechMonoCheckbox = document.getElementById(
       'fullband-speech-mono-quality'
@@ -863,6 +880,24 @@ export class DemoMeetingApp
       } else {
         this.audioVideo.realtimeMuteLocalAudio();
       }
+    });
+
+    const previousVideoSet = document.getElementById('previous-video-set');
+    previousVideoSet.addEventListener('click', _e => {
+      if (this.screenSet > 1) {
+        this.screenSet -= 1
+      } else {
+        this.screenSet = 1
+      }
+      this.updateDownlinkPreference();
+    });
+
+    const nextVideoSet = document.getElementById('next-video-set');
+    nextVideoSet.addEventListener('click', _e => {
+      if (this.screenSet >= 1 && this.screenSet <= 3) {
+        this.screenSet += 1
+      }
+      this.updateDownlinkPreference();
     });
 
     const buttonCloudCapture = document.getElementById('button-record-cloud') as HTMLButtonElement;
@@ -1610,9 +1645,10 @@ export class DemoMeetingApp
       this.priorityBasedDownlinkPolicy = new VideoPriorityBasedPolicy(this.meetingLogger, this.videoPriorityBasedPolicyConfig);
       configuration.videoDownlinkBandwidthPolicy = this.priorityBasedDownlinkPolicy;
       this.priorityBasedDownlinkPolicy.addObserver(this);
-    } else if (this.enableSimulcast) {
-      configuration.videoDownlinkBandwidthPolicy = new VideoAdaptiveProbePolicy(this.meetingLogger);
     }
+    // else if (this.enableSimulcast) {
+    //   configuration.videoDownlinkBandwidthPolicy = new VideoAdaptiveProbePolicy(this.meetingLogger);
+    // }
 
     this.meetingSession = new DefaultMeetingSession(
       configuration,
@@ -3233,12 +3269,43 @@ export class DemoMeetingApp
       }
   }
 
-  updateDownlinkPreference(): void {
-    if (!this.priorityBasedDownlinkPolicy) {
-      return;
-    }
+  fixedVideoStreamSize = 25;
+  screenSet = 1;
+
+
+  subscribeToVideo(start: number, stride = this.fixedVideoStreamSize) {
     const videoPreferences = VideoPreferences.prepare();
+    const selfAttendee = this.meetingSession.configuration.credentials.attendeeId;
+    const sortedRosterAttendeeId = [];
     for (const attendeeId in this.roster) {
+      if (attendeeId != selfAttendee) {
+        sortedRosterAttendeeId.push(attendeeId);
+      }
+    }
+
+    // Improve the sorting mechanism
+
+    console.error(sortedRosterAttendeeId)
+
+    sortedRosterAttendeeId.sort();
+
+    console.error('---------------------------------------');
+
+    console.error(sortedRosterAttendeeId)
+
+
+    // sortedRoster.sort(function(a, b) {
+    //   return a[0] - b[0];
+    // });
+
+    console.error(start);
+    console.error(start + stride);
+    console.error("Roster Length ", Object.keys(this.roster).length);
+
+    for(let i = start; i < start + stride && i < sortedRosterAttendeeId.length ; i++) {
+      const attendeeId = sortedRosterAttendeeId[i];
+      console.error(i, this.roster[attendeeId].hasVideo);
+
       if (this.roster[attendeeId].hasVideo) {
         if (this.roster[attendeeId].pinned) {
           videoPreferences.add(new VideoPreference(attendeeId, 1, TargetDisplaySize.High));
@@ -3251,6 +3318,23 @@ export class DemoMeetingApp
       }
     }
     this.priorityBasedDownlinkPolicy.chooseRemoteVideoSources(videoPreferences.build());
+  }
+
+  updateDownlinkPreference(): void {
+
+    if (!this.priorityBasedDownlinkPolicy) {
+      return;
+    }
+
+    if (this.screenSet == 1) {
+      this.subscribeToVideo(0);
+    } else if (this.screenSet == 2) {
+      this.subscribeToVideo(25);
+    } else if (this.screenSet == 3) {
+      this.subscribeToVideo(50);
+    } else if (this.screenSet == 4) {
+      this.subscribeToVideo(75);
+    }
   }
 
   isContentTile(tileIndex: number): boolean {
