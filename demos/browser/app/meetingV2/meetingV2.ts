@@ -21,7 +21,6 @@ import {
   DataMessage,
   DefaultActiveSpeakerPolicy,
   DefaultAudioMixController,
-  DefaultAudioVideoController,
   DefaultBrowserBehavior,
   DefaultDeviceController,
   DefaultMeetingEventReporter,
@@ -1500,6 +1499,8 @@ export class DemoMeetingApp
     if (this.enableSimulcast) {
       const policy = (document.getElementById('simulcast-policy') as HTMLSelectElement).value;
       if (policy === 'nscale-lower') {
+        configuration.videoUplinkBandwidthPolicy = new SimulcastUplinkPolicyNScaleLowStream(configuration.credentials.attendeeId, this.meetingLogger);
+      } else if (policy === 'fixed-stream') {
         configuration.videoUplinkBandwidthPolicy = new SimulcastUplinkPolicyFixedStream(configuration.credentials.attendeeId, this.meetingLogger);
       }
     }
