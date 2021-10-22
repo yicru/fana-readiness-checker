@@ -234,6 +234,7 @@ import SimulcastUplinkObserver from './videouplinkbandwidthpolicy/SimulcastUplin
 import SimulcastUplinkPolicy from './videouplinkbandwidthpolicy/SimulcastUplinkPolicy';
 import SimulcastUplinkPolicyFixedStream from './videouplinkbandwidthpolicy/SimulcastUplinkPolicyFixedStream';
 import SimulcastUplinkPolicyNScaleLowStream from './videouplinkbandwidthpolicy/SimulcastUplinkPolicyNScaleLowStream';
+import SimulcastUplinkPolicyNScaleLowStream2 from './videouplinkbandwidthpolicy/SimulcastUplinkPolicyNScaleLowStream2';
 import SimulcastVideoStreamIndex from './videostreamindex/SimulcastVideoStreamIndex';
 import SingleNodeAudioTransformDevice from './devicecontroller/SingleNodeAudioTransformDevice';
 import StatsCollector from './statscollector/StatsCollector';
@@ -549,6 +550,7 @@ export {
   SimulcastUplinkPolicy,
   SimulcastUplinkPolicyFixedStream,
   SimulcastUplinkPolicyNScaleLowStream,
+  SimulcastUplinkPolicyNScaleLowStream2,
   SimulcastVideoStreamIndex,
   SingleNodeAudioTransformDevice,
   Some,
