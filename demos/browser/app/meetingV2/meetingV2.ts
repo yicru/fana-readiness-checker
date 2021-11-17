@@ -504,11 +504,16 @@ export class DemoMeetingApp
       const priorityBasedDownlinkPolicyConfig = document.getElementById(
         'priority-downlink-policy-preset'
       ) as HTMLSelectElement;
+      const priorityBasedDownlinkPolicyDisablePauseCheckbox = document.getElementById(
+        'priority-downlink-policy-disable-pause-checkbox'
+      );
 
       if (this.usePriorityBasedDownlinkPolicy) {
         priorityBasedDownlinkPolicyConfig.style.display = 'block';
+        priorityBasedDownlinkPolicyDisablePauseCheckbox.style.display = 'block';
       } else {
         priorityBasedDownlinkPolicyConfig.style.display = 'none';
+        priorityBasedDownlinkPolicyDisablePauseCheckbox.style.display = 'none';
       }
     });
 
@@ -537,6 +542,7 @@ export class DemoMeetingApp
       this.enableEventReporting = (document.getElementById('event-reporting') as HTMLInputElement).checked;
       this.enableWebAudio = (document.getElementById('webaudio') as HTMLInputElement).checked;
       this.usePriorityBasedDownlinkPolicy = (document.getElementById('priority-downlink-policy') as HTMLInputElement).checked;
+      this.videoPriorityBasedPolicyConfig.disableNetworkPause = (document.getElementById('priority-downlink-policy-disable-pause') as HTMLInputElement).checked;
 
       const chosenLogLevel = (document.getElementById('logLevelSelect') as HTMLSelectElement).value;
       switch (chosenLogLevel) {

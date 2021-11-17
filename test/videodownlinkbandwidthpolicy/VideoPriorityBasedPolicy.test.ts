@@ -290,6 +290,54 @@ describe('VideoPriorityBasedPolicy', () => {
       expect(tile2.state().paused).to.be.false;
       expect(tile3.state().paused).to.be.true;
     });
+
+    // This is identical setup to the previous test
+    it('will not pause tiles if not enough bandwidth for default preference if disabled', () => {
+      const config = new VideoPriorityBasedPolicyConfig(0, 0);
+      config.disableNetworkPause = true;
+      const policy = new VideoPriorityBasedPolicy(logger);
+      policy.setVideoPriorityBasedPolicyConfigs(config);
+
+      policy.bindToTileController(tileController);
+      updateIndexFrame(videoStreamIndex, 3, 0, 1000);
+      policy.updateIndex(videoStreamIndex);
+      let resub = policy.wantsResubscribe();
+      expect(resub).to.equal(true);
+      let received = policy.chooseSubscriptions();
+      expect(received.array()).to.deep.equal([2, 4, 6]);
+      const tile1 = tileController.addVideoTile();
+      tile1.stateRef().boundAttendeeId = 'attendee-1';
+      const tile2 = tileController.addVideoTile();
+      tile2.stateRef().boundAttendeeId = 'attendee-2';
+      const tile3 = tileController.addVideoTile();
+      tile3.stateRef().boundAttendeeId = 'attendee-3';
+      expect(tileController.getAllVideoTiles().length).to.equal(3);
+
+      const metricReport = new DefaultClientMetricReport(logger);
+      metricReport.globalMetricReport = new GlobalMetricReport();
+      metricReport.globalMetricReport.currentMetrics['googAvailableReceiveBandwidth'] = 3000 * 1000;
+      policy.updateMetrics(metricReport);
+
+      resub = policy.wantsResubscribe();
+      expect(resub).to.equal(false);
+      received = policy.chooseSubscriptions();
+      expect(received.array()).to.deep.equal([2, 4, 6]);
+      expect(tile1.state().paused).to.be.false;
+      expect(tile2.state().paused).to.be.false;
+      expect(tile3.state().paused).to.be.false;
+
+      incrementTime(2100);
+      metricReport.globalMetricReport.currentMetrics['googAvailableReceiveBandwidth'] = 2600 * 1000;
+      policy.updateMetrics(metricReport);
+
+      resub = policy.wantsResubscribe();
+      expect(resub).to.equal(false);
+      received = policy.chooseSubscriptions();
+      expect(received.array()).to.deep.equal([2, 4, 6]);
+      expect(tile1.state().paused).to.be.false;
+      expect(tile2.state().paused).to.be.false;
+      expect(tile3.state().paused).to.be.false;
+    });
   });
 
   describe('chooseRemoteVideoSources', () => {

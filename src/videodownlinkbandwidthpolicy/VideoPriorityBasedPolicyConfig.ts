@@ -10,6 +10,12 @@ export default class VideoPriorityBasedPolicyConfig {
   static readonly UnstableNetworkPreset = new VideoPriorityBasedPolicyConfig(0, 1);
   static readonly StableNetworkPreset = new VideoPriorityBasedPolicyConfig(1, 0);
 
+  /**
+   * Do not pause videos, and only allow switching between simulcast streams.  WARNING: Setting to `true`
+   * may lead to video freezes across more sources then if `false` as the link may not support all streams.
+   */
+  disableNetworkPause: boolean = false;
+
   /** Initializes a [[VideoPriorityBasedPolicyConfig]] with the network event delays.
    *
    * @param networkIssueResponseDelayFactor Delays before reducing subscribed video bitrate. Input should be a value between 0 and 1.
@@ -33,5 +39,6 @@ export default class VideoPriorityBasedPolicyConfig {
       networkIssueRecoveryDelayFactor = 1;
     }
     this.networkIssueRecoveryDelayFactor = networkIssueRecoveryDelayFactor;
+    this.disableNetworkPause = false;
   }
 }

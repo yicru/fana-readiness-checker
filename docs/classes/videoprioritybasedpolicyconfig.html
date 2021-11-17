@@ -94,6 +94,7 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="videoprioritybasedpolicyconfig.html#disablenetworkpause" class="tsd-kind-icon">disable<wbr>Network<wbr>Pause</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="videoprioritybasedpolicyconfig.html#networkissuerecoverydelayfactor" class="tsd-kind-icon">network<wbr>Issue<wbr>Recovery<wbr>Delay<wbr>Factor</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="videoprioritybasedpolicyconfig.html#networkissueresponsedelayfactor" class="tsd-kind-icon">network<wbr>Issue<wbr>Response<wbr>Delay<wbr>Factor</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><a href="videoprioritybasedpolicyconfig.html#default" class="tsd-kind-icon">Default</a></li>
@@ -116,7 +117,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/aws/amazon-chime-sdk-js/blob/master/src/videodownlinkbandwidthpolicy/VideoPriorityBasedPolicyConfig.ts#L11">src/videodownlinkbandwidthpolicy/VideoPriorityBasedPolicyConfig.ts:11</a></li>
+									<li>Defined in <a href="https://github.com/aws/amazon-chime-sdk-js/blob/master/src/videodownlinkbandwidthpolicy/VideoPriorityBasedPolicyConfig.ts#L17">src/videodownlinkbandwidthpolicy/VideoPriorityBasedPolicyConfig.ts:17</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -152,12 +153,28 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="disablenetworkpause" class="tsd-anchor"></a>
+					<h3>disable<wbr>Network<wbr>Pause</h3>
+					<div class="tsd-signature tsd-kind-icon">disable<wbr>Network<wbr>Pause<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/aws/amazon-chime-sdk-js/blob/master/src/videodownlinkbandwidthpolicy/VideoPriorityBasedPolicyConfig.ts#L17">src/videodownlinkbandwidthpolicy/VideoPriorityBasedPolicyConfig.ts:17</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Do not pause videos, and only allow switching between simulcast streams.  WARNING: Setting to <code>true</code>
+							may lead to video freezes across more sources then if <code>false</code> as the link may not support all streams.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="networkissuerecoverydelayfactor" class="tsd-anchor"></a>
 					<h3>network<wbr>Issue<wbr>Recovery<wbr>Delay<wbr>Factor</h3>
 					<div class="tsd-signature tsd-kind-icon">network<wbr>Issue<wbr>Recovery<wbr>Delay<wbr>Factor<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/aws/amazon-chime-sdk-js/blob/master/src/videodownlinkbandwidthpolicy/VideoPriorityBasedPolicyConfig.ts#L21">src/videodownlinkbandwidthpolicy/VideoPriorityBasedPolicyConfig.ts:21</a></li>
+							<li>Defined in <a href="https://github.com/aws/amazon-chime-sdk-js/blob/master/src/videodownlinkbandwidthpolicy/VideoPriorityBasedPolicyConfig.ts#L27">src/videodownlinkbandwidthpolicy/VideoPriorityBasedPolicyConfig.ts:27</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -173,7 +190,7 @@
 					<div class="tsd-signature tsd-kind-icon">network<wbr>Issue<wbr>Response<wbr>Delay<wbr>Factor<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/aws/amazon-chime-sdk-js/blob/master/src/videodownlinkbandwidthpolicy/VideoPriorityBasedPolicyConfig.ts#L20">src/videodownlinkbandwidthpolicy/VideoPriorityBasedPolicyConfig.ts:20</a></li>
+							<li>Defined in <a href="https://github.com/aws/amazon-chime-sdk-js/blob/master/src/videodownlinkbandwidthpolicy/VideoPriorityBasedPolicyConfig.ts#L26">src/videodownlinkbandwidthpolicy/VideoPriorityBasedPolicyConfig.ts:26</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -231,6 +248,9 @@
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class">
 								<a href="videoprioritybasedpolicyconfig.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="videoprioritybasedpolicyconfig.html#disablenetworkpause" class="tsd-kind-icon">disable<wbr>Network<wbr>Pause</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="videoprioritybasedpolicyconfig.html#networkissuerecoverydelayfactor" class="tsd-kind-icon">network<wbr>Issue<wbr>Recovery<wbr>Delay<wbr>Factor</a>
