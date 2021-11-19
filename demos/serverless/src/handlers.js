@@ -168,7 +168,7 @@ exports.start_transcription = async (event, context) => {
     }));
   }
 
-  chimeMeetings = new ChimeMeetings(AWS, event.queryStringParameters.controlRegion, endpoint);
+  chimeMeetings = new ChimeMeetings(AWS, event.queryStringParameters.controlRegion, endpoint, chimeMeetingsRegionalEndPoints);
   // start transcription for the meeting
   await chimeMeetings.startMeetingTranscription({
     MeetingId: meeting.Meeting.MeetingId,
