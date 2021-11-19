@@ -11,6 +11,22 @@ Parameters:
     Description: The AWS SDK Chime endpoint
     Default: "https://service.chime.aws.amazon.com"
     Type: String
+  ChimeMeetingsRegionalEndpoints:
+    Description: The AWS SDK Chime Regional Endpoints 
+    Default: '{
+      "https://service.chime.aws.amazon.com": {
+        "us-east-1": "meetings-chime.us-east-1.amazonaws.com", 
+        "us-west-2": "meetings-chime.us-west-2.amazonaws.com", 
+        "eu-central-1": "meetings-chime.eu-central-1.amazonaws.com",
+        "ap-southeast-1": "meetings-chime.ap-southeast-1.amazonaws.com"
+      },
+      "https://tapioca.us-east-1.amazonaws.com": {
+        "us-east-1": "meetings-gchime.us-east-1.amazonaws.com", 
+        "eu-central-1": "meetings-gchime.eu-central-1.amazonaws.com",
+        "ap-southeast-1": "meetings-gchime.ap-southeast-1.amazonaws.com"
+      }
+    }'
+    Type: String
   ChimeServicePrincipal:
     Description: "The principal that will capture to the S3 bucket"
     Default: "chime.amazonaws.com"
@@ -33,6 +49,7 @@ Globals:
         BROWSER_LOG_GROUP_NAME: !Ref ChimeBrowserLogs
         BROWSER_MEETING_EVENT_LOG_GROUP_NAME: !Ref ChimeBrowserMeetingEventLogs
         CHIME_ENDPOINT: !Ref ChimeEndpoint
+        CHIME_MEETINGS_REGIONAL_ENDPOINTS: !Ref ChimeMeetingsRegionalEndpoints
         BROWSER_EVENT_INGESTION_LOG_GROUP_NAME: !Ref ChimeBrowserEventIngestionLogs
         CAPTURE_S3_DESTINATION_PREFIX: !Ref ChimeMediaCaptureS3BucketPrefix
         AWS_ACCOUNT_ID: !Sub "${AWS::AccountId}"

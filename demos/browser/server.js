@@ -1,6 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
+const ChimeMeetings = require('./ChimeMeetings.js');
 const AWS = require('aws-sdk');
 const compression = require('compression');
 const fs = require('fs');
@@ -22,14 +23,12 @@ const indexPage = fs.readFileSync(indexPagePath);
 // Create ans AWS SDK Chime object. Region 'us-east-1' is currently required.
 // Use the MediaRegion property below in CreateMeeting to select the region
 // the meeting is hosted in.
-const chime = new AWS.Chime({ region: 'us-east-1' });
 const sts = new AWS.STS({ region: 'us-east-1' })
 
 // Set the AWS SDK Chime endpoint. The global endpoint is https://service.chime.aws.amazon.com.
 const endpoint = process.env.ENDPOINT || 'https://service.chime.aws.amazon.com';
 console.info('Using endpoint', endpoint);
 
-chime.endpoint = new AWS.Endpoint(endpoint);
 
 const captureS3Destination = process.env.CAPTURE_S3_DESTINATION;
 if (captureS3Destination) {
@@ -46,6 +45,7 @@ function serve(host = '127.0.0.1:8080') {
       // Enable HTTP compression
       compression({})(request, response, () => {});
       const requestUrl = url.parse(request.url, true);
+      let chimeMeetings= new ChimeMeetings(AWS, requestUrl.query.controlRegion, endpoint);
       if (request.method === 'GET' && requestUrl.pathname === '/') {
         // Return the contents of the index page
         respond(response, 200, 'text/html', indexPage);
@@ -59,7 +59,7 @@ function serve(host = '127.0.0.1:8080') {
 
         // Look up the meeting by its title. If it does not exist, create the meeting.
         if (!meetingTable[requestUrl.query.title]) {
-          meetingTable[requestUrl.query.title] = await chime.createMeeting({
+          meetingTable[requestUrl.query.title] = await chimeMeetings.createMeeting({
             // Use a UUID for the client request token to ensure that any request retries
             // do not create multiple meetings.
             ClientRequestToken: uuidv4(),
@@ -76,7 +76,7 @@ function serve(host = '127.0.0.1:8080') {
         const meeting = meetingTable[requestUrl.query.title];
 
         // Create new attendee for the meeting
-        const attendee = await chime.createAttendee({
+        const attendee = await chimeMeetings.createAttendee({
           // The meeting ID of the created meeting to add the attendee to
           MeetingId: meeting.Meeting.MeetingId,
 
@@ -97,14 +97,14 @@ function serve(host = '127.0.0.1:8080') {
         }, null, 2));
       } else if (request.method === 'POST' && requestUrl.pathname === '/end') {
         // End the meeting. All attendee connections will hang up.
-        await chime.deleteMeeting({
+        await chimeMeetings.deleteMeeting({
           MeetingId: meetingTable[requestUrl.query.title].Meeting.MeetingId,
         }).promise();
         respond(response, 200, 'application/json', JSON.stringify({}));
       } else if (request.method === 'POST' && requestUrl.pathname === '/startCapture') {
         if (captureS3Destination) {
           const callerInfo = await sts.getCallerIdentity().promise()
-          pipelineInfo = await chime.createMediaCapturePipeline({
+          pipelineInfo = await chimeMeetings.createMediaCapturePipeline({
             SourceType: "ChimeSdkMeeting",
             SourceArn: `arn:aws:chime::${callerInfo.Account}:meeting:${meetingTable[requestUrl.query.title].Meeting.MeetingId}`,
             SinkType: "S3Bucket",
@@ -119,7 +119,7 @@ function serve(host = '127.0.0.1:8080') {
       } else if (request.method === 'POST' && requestUrl.pathname === '/endCapture') {
         if (captureS3Destination) {
           pipelineInfo = meetingTable[requestUrl.query.title].Capture;
-          await chime.deleteMediaCapturePipeline({
+          await chimeMeetings.deleteMediaCapturePipeline({
             MediaPipelineId: pipelineInfo.MediaPipelineId
           }).promise();
           meetingTable[requestUrl.query.title].Capture = undefined;
@@ -137,7 +137,7 @@ function serve(host = '127.0.0.1:8080') {
         respond(response, 200, 'application/json', JSON.stringify(awsCredentials), true);
       } else if (request.method === 'POST' && requestUrl.pathname === '/end') {
         // End the meeting. All attendee connections will hang up.
-        await chime.deleteMeeting({
+        await chimeMeetings.deleteMeeting({
           MeetingId: meetingTable[requestUrl.query.title].Meeting.MeetingId,
         }).promise();
         respond(response, 200, 'application/json', JSON.stringify({}));
@@ -195,13 +195,13 @@ function serve(host = '127.0.0.1:8080') {
           }));
         }
 
-        await chime.startMeetingTranscription({
+        await chimeMeetings.startMeetingTranscription({
           MeetingId: meetingTable[requestUrl.query.title].Meeting.MeetingId,
           TranscriptionConfiguration: transcriptionConfiguration
         }).promise();
         respond(response, 200, 'application/json', JSON.stringify({}));
       } else if (request.method === 'POST' && requestUrl.pathname === '/stop_transcription') {
-        await chime.stopMeetingTranscription({
+        await chimeMeetings.stopMeetingTranscription({
           MeetingId: meetingTable[requestUrl.query.title].Meeting.MeetingId
         }).promise();
         respond(response, 200, 'application/json', JSON.stringify({}));

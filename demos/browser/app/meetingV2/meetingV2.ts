@@ -278,6 +278,7 @@ export class DemoMeetingApp
   voiceConnectorId: string | null = null;
   sipURI: string | null = null;
   region: string | null = null;
+  controlRegion: string | null = null;
   meetingSession: MeetingSession | null = null;
   priorityBasedDownlinkPolicy: VideoPriorityBasedPolicy | null = null;
   audioVideo: AudioVideoFacade | null = null;
@@ -449,6 +450,7 @@ export class DemoMeetingApp
 
   initParameters(): void {
     const meeting = new URL(window.location.href).searchParams.get('m');
+    this.controlRegion = new URL(window.location.href).searchParams.get('controlRegion');
     if (meeting) {
       (document.getElementById('inputMeeting') as HTMLInputElement).value = meeting;
       (document.getElementById('inputName') as HTMLInputElement).focus();
@@ -1093,7 +1095,7 @@ export class DemoMeetingApp
 
     const startLiveTranscription = async (engine: string, languageCode: string, region: string, transcriptionStreamParams: TranscriptionStreamParams) => {
       const transcriptionAdditionalParams = JSON.stringify(transcriptionStreamParams);
-      const response = await fetch(`${DemoMeetingApp.BASE_URL}start_transcription?title=${encodeURIComponent(this.meeting)}&engine=${encodeURIComponent(engine)}&language=${encodeURIComponent(languageCode)}&region=${encodeURIComponent(region)}&transcriptionStreamParams=${encodeURIComponent(transcriptionAdditionalParams)}`, {
+      const response = await fetch(`${DemoMeetingApp.BASE_URL}start_transcription?title=${encodeURIComponent(this.meeting)}&engine=${encodeURIComponent(engine)}&language=${encodeURIComponent(languageCode)}&region=${encodeURIComponent(region)}&transcriptionStreamParams=${encodeURIComponent(transcriptionAdditionalParams)}&controlRegion=${encodeURIComponent(this.controlRegion)}`, {
         method: 'POST',
       });
       const json = await response.json();
@@ -2109,7 +2111,7 @@ export class DemoMeetingApp
     const response = await fetch(
       `${DemoMeetingApp.BASE_URL}join?title=${encodeURIComponent(
         this.meeting
-      )}&name=${encodeURIComponent(this.name)}&region=${encodeURIComponent(this.region)}`,
+      )}&name=${encodeURIComponent(this.name)}&region=${encodeURIComponent(this.region)}&controlRegion=${encodeURIComponent(this.controlRegion)}`,
       {
         method: 'POST',
       }
@@ -2138,7 +2140,7 @@ export class DemoMeetingApp
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async endMeeting(): Promise<any> {
-    await fetch(`${DemoMeetingApp.BASE_URL}end?title=${encodeURIComponent(this.meeting)}`, {
+    await fetch(`${DemoMeetingApp.BASE_URL}end?title=${encodeURIComponent(this.meeting)}&controlRegion=${encodeURIComponent(this.controlRegion)}`, {
       method: 'POST',
     });
   }
@@ -2501,7 +2503,7 @@ export class DemoMeetingApp
     this.log('live transcription were previously set to ' + this.enableLiveTranscription + '; attempting to toggle');
 
     if (this.enableLiveTranscription) {
-      const response = await fetch(`${DemoMeetingApp.BASE_URL}${encodeURIComponent('stop_transcription')}?title=${encodeURIComponent(this.meeting)}`, {
+      const response = await fetch(`${DemoMeetingApp.BASE_URL}${encodeURIComponent('stop_transcription')}?title=${encodeURIComponent(this.meeting)}&controlRegion=${encodeURIComponent(this.controlRegion)}`, {
         method: 'POST',
       });
       const json = await response.json();
