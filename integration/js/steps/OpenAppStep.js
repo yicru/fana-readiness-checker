@@ -17,6 +17,7 @@ class OpenAppStep extends AppTestStep {
   async run() {
     this.logger(`Opening : ${this.url}`);
     await this.page.open(this);
+    await this.page.waitForPageToLoad();
   }
 }
 

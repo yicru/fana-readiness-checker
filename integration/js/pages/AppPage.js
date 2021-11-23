@@ -33,6 +33,7 @@ function findAllElements() {
     switchToSipFlow: By.id('to-sip-flow'),
 
     authenticationFlow: By.id('flow-authenticate'),
+    permisssionsFlow: By.id('flow-need-permission'),
     deviceFlow: By.id('flow-devices'),
     meetingFlow: By.id('flow-meeting'),
     sipAuthenticateFlow: By.id('flow-sip-authenticate'),
@@ -328,6 +329,21 @@ class AppPage {
     return 'failed'
   }
 
+  async waitForPageToLoad() {
+    let timeout = 10;
+    let i = 0;
+    let loading = false;
+    while (!loading && i < timeout) {
+      loading = await this.isWaitingForPageToLoad();
+      if (loading) {
+        return 'done'
+      }
+      i++;
+      await TestUtils.waitAround(1000);
+    }
+    return 'failed'
+  }
+
   async waitForSipAuthentication() {
     let timeout = 10;
     let i = 0;
@@ -551,7 +567,11 @@ class AppPage {
   }
 
   async isAuthenticating() {
-    return await this.driver.findElement(elements.authenticationFlow).isDisplayed();
+    return await this.driver.findElement(elements.authenticationFlow).isDisplayed() || await this.driver.findElement(elements.permisssionsFlow).isDisplayed();
+  }
+  
+  async isWaitingForPageToLoad() {
+    return await this.driver.findElements(elements.authenticationFlow).length > 0;
   }
 
   async isMeetingEnding() {
